@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>たしざん４</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0, #fd79a8);
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: calc(100vh - 30px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: rotate(0deg) translate(-50%, -50%); }
+            100% { transform: rotate(360deg) translate(-50%, -50%); }
+        }
+
+        h1 {
+            color: #e17055;
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .score {
+            background: #55a3ff;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .problem-text {
+            background: #ffeaa7;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            line-height: 1.5;
+            border: 3px solid #fdcb6e;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+            min-height: 0;
+        }
+
+        /* 左エリア - どんぐりゾーン */
+        .left-section {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .left-section h3 {
+            margin: 0 0 10px 0;
+            color: #2d3436;
+            font-size: 1.3em;
+        }
+
+        /* 真ん中エリア - 式とボタン */
+        .center-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* 右エリア - かんがえかた */
+        .right-section {
+            flex: 1;
+            background: #e8f5ff;
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .person-section {
+            background: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .person-section h4 {
+            margin: 0 0 10px 0;
+            color: #2d3436;
+            font-size: 1.1em;
+        }
+
+        .acorn-container {
+            min-height: 70px;
+            padding: 12px;
+            background: rgba(255,255,255,0.9);
+            border: 2px dashed #74b9ff;
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            position: relative;
+        }
+
+        .acorn {
+            width: 28px;
+            height: 28px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            user-select: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .acorn:hover {
+            transform: scale(1.1);
+        }
+
+        .white-acorn {
+            background-color: white;
+            border: 2px dashed #74b9ff;
+            color: #74b9ff;
+        }
+
+        .ten-frame {
+            border: 3px solid #00b894 !important;
+            background-color: rgba(0, 184, 148, 0.1) !important;
+            border-radius: 10px;
+            padding: 10px;
+            position: relative;
+        }
+
+        .ten-frame::after {
+            content: '１０';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00b894;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .formula-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #74b9ff;
+            position: relative;
+            min-height: 180px;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .formula-section h3 {
+            margin: 0 0 15px 0;
+            color: #2d3436;
+            font-size: 1.3em;
+        }
+
+        .formula-inputs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+        }
+
+        .formula-number {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* 10を囲むスタイル */
+        .ten-circle {
+            position: absolute;
+            border: 2px solid #00b894;
+            border-radius: 50% / 50%;
+            background: rgba(0, 184, 148, 0.15);
+            z-index: 12;
+            box-shadow: 0 0 15px rgba(0, 184, 148, 0.4);
+        }
+
+        /* さくらんぼ方式のスタイル */
+        .cherry-display {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 10;
+        }
+
+        .cherry-display.show {
+            opacity: 1;
+        }
+
+        .cherry-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 1.1em;
+        }
+
+        .cherry-line {
+            width: 2px;
+            height: 40px;
+            background: #2d3436;
+            margin: 5px 0;
+            position: relative;
+            animation: cherryLineGrow 1s ease-out 0.3s both;
+        }
+
+        .cherry-branches {
+            display: flex;
+            gap: 25px;
+            position: relative;
+        }
+
+        .cherry-branches::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background: #2d3436;
+            animation: cherryBranchGrow 0.8s ease-out 1s both;
+        }
+
+        .cherry-branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cherry-branch-line {
+            width: 2px;
+            height: 25px;
+            background: #2d3436;
+            margin-bottom: 5px;
+            animation: cherryBranchLineGrow 0.6s ease-out both;
+        }
+
+        .cherry-branch:nth-child(1) .cherry-branch-line {
+            animation-delay: 1.5s;
+        }
+
+        .cherry-branch:nth-child(2) .cherry-branch-line {
+            animation-delay: 1.7s;
+        }
+
+        .cherry-value {
+            background: #74b9ff;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 50%;
+            font-weight: bold;
+            border: 2px solid #0984e3;
+            min-width: 30px;
+            text-align: center;
+            animation: cherryPop 0.8s ease forwards;
+            opacity: 0;
+            position: relative;
+        }
+
+        .cherry-value.first {
+            background: #ff7675;
+            border-color: #d63031;
+            animation-delay: 2s;
+        }
+
+        .cherry-value.second {
+            background: #00b894;
+            border-color: #00a085;
+            animation-delay: 2.2s;
+        }
+
+        @keyframes cherryLineGrow {
+            0% { height: 0; }
+            100% { height: 40px; }
+        }
+
+        @keyframes cherryBranchGrow {
+            0% { width: 0; }
+            100% { width: 50px; }
+        }
+
+        @keyframes cherryBranchLineGrow {
+            0% { height: 0; }
+            100% { height: 25px; }
+        }
+
+        @keyframes cherryPop {
+            0% { 
+                opacity: 0; 
+                transform: scale(0.3) translateY(-15px); 
+            }
+            50% { 
+                transform: scale(1.3) translateY(-8px); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1) translateY(0); 
+            }
+        }
+
+        /* 式の項を強調表示するスタイル */
+        .formula-highlight {
+            background: #74b9ff;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 50%;
+            border: 2px solid #0984e3;
+            animation: formulaHighlight 2s ease-in-out;
+        }
+
+        @keyframes formulaHighlight {
+            0%, 100% { transform: scale(1); }
+            30%, 70% { 
+                transform: scale(1.2); 
+                box-shadow: 0 0 15px rgba(116, 185, 255, 0.6); 
+            }
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            width: 100%;
+            max-width: 350px;
+            margin-top: 20px;
+        }
+
+        button {
+            font-size: 1.2em;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .check-btn {
+            background: #00b894;
+            color: white;
+        }
+
+        .check-btn:hover {
+            background: #00a085;
+            transform: translateY(-2px);
+        }
+
+        .next-btn {
+            background: #fdcb6e;
+            color: #2d3436;
+        }
+
+        .next-btn:hover {
+            background: #e17055;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .calculation-steps {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #00b894;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .calculation-steps h3 {
+            margin: 0 0 15px 0;
+            color: #2d3436;
+            font-size: 1.2em;
+        }
+
+        .step {
+            margin: 12px 0;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #74b9ff;
+            display: none;
+            font-size: 1.1em;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        input {
+            font-size: 1.2em;
+            padding: 8px;
+            border: 2px solid #74b9ff;
+            border-radius: 8px;
+            width: 50px;
+            text-align: center;
+            margin: 3px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0984e3;
+            box-shadow: 0 0 8px rgba(116, 185, 255, 0.5);
+        }
+
+        /* spinnerを非表示 */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .ten-block {
+            background: #00b894;
+            color: white;
+            border: 2px solid #00a085;
+            border-radius: 5px;
+            padding: 3px 8px;
+            margin: 0 3px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        /* 式ゾーンの10ブロック */
+        .formula-ten-block {
+            position: absolute;
+            background: #00b894;
+            color: white;
+            border: 2px solid #00a085;
+            border-radius: 5px;
+            padding: 3px 8px;
+            font-weight: bold;
+            font-size: 1em;
+            min-width: 30px;
+            text-align: center;
+            z-index: 15;
+            opacity: 0;
+            animation: formulaTenShow 2s ease-in-out forwards;
+        }
+
+        @keyframes formulaTenShow {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.3);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* メッセージ表示のスタイル */
+        .message {
+            font-size: 1.4em;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .message.show {
+            display: block;
+            animation: messageSlide 0.5s ease-in-out;
+        }
+
+        .message.error {
+            background: #ffeaa7;
+            color: #e17055;
+            border: 2px solid #e17055;
+        }
+
+        .message.success {
+            background: #d1f2eb;
+            color: #00b894;
+            border: 2px solid #00b894;
+        }
+
+        @keyframes messageSlide {
+            from { 
+                opacity: 0; 
+                transform: translateY(-20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .result {
+            font-size: 1.3em;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .clear {
+            background: #e8f5e8;
+            color: #27ae60;
+            border: 3px solid #27ae60;
+            font-size: 1.8em;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .restart-btn {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        .restart-btn:hover {
+            background: #5f3dc4;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* モバイル対応のメディアクエリ */
+        @media (max-width: 1200px) {
+            .main-layout {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .container {
+                max-width: 800px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .formula-inputs {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            input {
+                font-size: 1.1em;
+                width: 45px;
+            }
+            
+            .step {
+                font-size: 1em;
+            }
+
+            .cherry-display {
+                position: relative;
+                top: 20px;
+                left: 0;
+                transform: none;
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌰 たしざん４ 🌰</h1>
+        
+        <div class="score">
+            せいかい: <span id="correct-count">0</span>/3
+        </div>
+
+        <div class="problem-text">
+            <div id="problem-text"></div>
+        </div>
+
+        <div id="problem-area">
+            <div class="main-layout">
+                <!-- 左エリア - どんぐりゾーン -->
+                <div class="left-section">
+                    <h3>🌰 どんぐり 🌰</h3>
+                    
+                    <div class="person-section">
+                        <h4><strong id="person-a-name">Aさん</strong>の どんぐり</h4>
+                        <div class="acorn-container" id="acorns-a"></div>
+                    </div>
+                    
+                    <div class="person-section">
+                        <h4><strong id="person-b-name">Bさん</strong>の どんぐり</h4>
+                        <div class="acorn-container" id="acorns-b"></div>
+                    </div>
+                </div>
+
+                <!-- 真ん中エリア - 式とボタン -->
+                <div class="center-section">
+                    <div class="formula-section">
+                        <h3>しき</h3>
+                        <div class="formula-inputs">
+                            <span class="formula-number" id="formula-first-container">
+                                <input type="number" id="formula-first" min="1" max="9">
+                                <!-- さくらんぼ方式の表示 - 前項用 -->
+                                <div id="cherry-display-first" class="cherry-display">
+                                    <div class="cherry-container">
+                                        <div class="cherry-line"></div>
+                                        <div class="cherry-branches">
+                                            <div class="cherry-branch">
+                                                <div class="cherry-branch-line"></div>
+                                                <div class="cherry-value first" id="cherry-split1-first"></div>
+                                            </div>
+                                            <div class="cherry-branch">
+                                                <div class="cherry-branch-line"></div>
+                                                <div class="cherry-value second" id="cherry-split2-first"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                            <span>＋</span>
+                            <span class="formula-number" id="formula-second-container">
+                                <input type="number" id="formula-second" min="1" max="9">
+                                <!-- さくらんぼ方式の表示 - 後項用 -->
+                                <div id="cherry-display-second" class="cherry-display">
+                                    <div class="cherry-container">
+                                        <div class="cherry-line"></div>
+                                        <div class="cherry-branches">
+                                            <div class="cherry-branch">
+                                                <div class="cherry-branch-line"></div>
+                                                <div class="cherry-value first" id="cherry-split1-second"></div>
+                                            </div>
+                                            <div class="cherry-branch">
+                                                <div class="cherry-branch-line"></div>
+                                                <div class="cherry-value second" id="cherry-split2-second"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- メッセージ表示エリア -->
+                    <div id="message" class="message"></div>
+
+                    <div class="buttons">
+                        <button class="check-btn" onclick="checkStep()">せいかいを かくにん</button>
+                        <button class="next-btn hidden" id="next-btn" onclick="nextProblem()">つぎのもんだい</button>
+                    </div>
+                </div>
+
+                <!-- 右エリア - かんがえかた -->
+                <div class="right-section">
+                    <div class="calculation-steps">
+                        <h3>かんがえかた</h3>
+                        <div class="step" id="step1">
+                            <strong>①</strong> <input type="number" id="step1-input1" min="1" max="9">は あと<input type="number" id="step1-input2" min="1" max="9">で１０になる。
+                        </div>
+                        <div class="step" id="step2">
+                            <strong>②</strong> <span id="other-num"></span>を<input type="number" id="step2-input1" min="1" max="9">と<input type="number" id="step2-input2" min="1" max="9">にわける。
+                        </div>
+                        <div class="step" id="step3">
+                            <strong>③</strong> <input type="number" id="step3-input1" min="1" max="9">と<input type="number" id="step3-input2" min="1" max="9">をたすと<span class="ten-block">１０</span>
+                        </div>
+                        <div class="step" id="step4">
+                            <strong>④</strong> <span class="ten-block">１０</span>と<input type="number" id="step4-input1" min="1" max="9">をたして<input type="number" id="step4-input2" min="11" max="20">
+                        </div>
+                        <div class="step" id="step5">
+                            <strong>⑤</strong> <span id="final-first"></span>＋<span id="final-second"></span>＝<input type="number" id="step5-input" min="11" max="20">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="clear-area" class="hidden">
+            <div class="result clear">
+                🎉 おめでとう！ 🎉<br>
+                ぜんぶせいかいです！
+            </div>
+            <button class="restart-btn" onclick="restartGame()">もういちど</button>
+        </div>
+    </div>
+
+    <script>
+        let currentProblem = {};
+        let correctCount = 0;
+        let totalProblems = 3;
+        let currentStep = 0;
+        let stepValues = {};
+        let isProcessing = false;
+        let cherryDisplayShown = false;
+        let tenCircleShown = false;
+
+        // メッセージ表示機能
+        function showMessage(text, type) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = text;
+            messageElement.className = `message ${type} show`;
+            
+            setTimeout(() => {
+                messageElement.classList.remove('show');
+            }, 3000);
+        }
+
+        function hideMessage() {
+            const messageElement = document.getElementById('message');
+            messageElement.classList.remove('show');
+        }
+
+        // さくらんぼ方式の表示を更新
+        function updateCherryDisplay(split1, split2, targetNum) {
+            if (targetNum === currentProblem.a) {
+                // 前項を分解する場合
+                document.getElementById('cherry-split1-first').textContent = split1;
+                document.getElementById('cherry-split2-first').textContent = split2;
+            } else {
+                // 後項を分解する場合
+                document.getElementById('cherry-split1-second').textContent = split1;
+                document.getElementById('cherry-split2-second').textContent = split2;
+            }
+        }
+
+        // 式の項を強調表示
+        function highlightFormulaNumber(containerId) {
+            const container = document.getElementById(containerId);
+            const input = container.querySelector('input');
+            input.classList.add('formula-highlight');
+            
+            setTimeout(() => {
+                input.classList.remove('formula-highlight');
+            }, 2500);
+        }
+
+        // 10になったことを示すアニメーション（前項・後項で調整版）
+        function showTenAnimation(num1, num2) {
+            const formulaSection = document.querySelector('.formula-section');
+            
+            // 選択された数字のコンテナを取得
+            let selectedContainer;
+            if (stepValues.selectedFirst) {
+                selectedContainer = document.getElementById('formula-first-container');
+            } else {
+                selectedContainer = document.getElementById('formula-second-container');
+            }
+            
+            // さくらんぼの分解された数字（赤い数字）を取得
+            let cherryValue;
+            if (stepValues.selectedFirst) {
+                // 前項が選択された場合、後項のさくらんぼの赤い数字
+                cherryValue = document.getElementById('cherry-split1-second');
+            } else {
+                // 後項が選択された場合、前項のさくらんぼの赤い数字
+                cherryValue = document.getElementById('cherry-split1-first');
+            }
+            
+            // 相対位置を計算
+            const selectedRect = selectedContainer.getBoundingClientRect();
+            const cherryRect = cherryValue.getBoundingClientRect();
+            const sectionRect = formulaSection.getBoundingClientRect();
+            
+            // 選択された数字の位置（相対位置）
+            const selectedX = selectedRect.left - sectionRect.left + selectedRect.width / 2;
+            const selectedY = selectedRect.top - sectionRect.top + selectedRect.height / 2;
+            
+            // さくらんぼの赤い数字の位置（相対位置）
+            const cherryX = cherryRect.left - sectionRect.left + cherryRect.width / 2;
+            const cherryY = cherryRect.top - sectionRect.top + cherryRect.height / 2;
+            
+            // 楕円を作成
+            const tenCircle = document.createElement('div');
+            tenCircle.className = 'ten-circle';
+            
+            if (stepValues.selectedFirst) {
+                // 前項を分解した場合
+                // 2点間の距離と角度を計算
+                const dx = cherryX - selectedX;
+                const dy = cherryY - selectedY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                
+                // 楕円のサイズ（細長い楕円）
+                const width = distance + 60;
+                const height = 45;
+                
+                // 中心位置（2点の中間点）
+                const centerX = (selectedX + cherryX) / 2;
+                const centerY = (selectedY + cherryY) / 2;
+                
+                tenCircle.style.left = (centerX - width / 2) + 'px';
+                tenCircle.style.top = (centerY - height / 2) + 'px';
+                tenCircle.style.width = width + 'px';
+                tenCircle.style.height = height + 'px';
+                tenCircle.style.transform = `rotate(${angle}deg)`;
+                tenCircle.style.borderRadius = '50% / 50%';
+            } else {
+                // 後項を分解した場合
+                // 2点間の距離と角度を計算
+                const dx = selectedX - cherryX;
+                const dy = selectedY - cherryY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                
+                // 楕円のサイズ（細長い楕円）
+                const width = distance + 50;
+                const height = 45;
+                
+                // 中心位置（2点の中間点）
+                const centerX = (selectedX + cherryX) / 2;
+                const centerY = (selectedY + cherryY) / 2;
+                
+                tenCircle.style.left = (centerX - width / 2) + 'px';
+                tenCircle.style.top = (centerY - height / 2) + 'px';
+                tenCircle.style.width = width + 'px';
+                tenCircle.style.height = height + 'px';
+                tenCircle.style.transform = `rotate(${angle}deg)`;
+                tenCircle.style.borderRadius = '50% / 50%';
+            }
+            
+            // アニメーション設定
+            tenCircle.style.opacity = '0';
+            tenCircle.style.transition = 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out';
+            
+            // 10ブロックを楕円の中心に配置
+            const tenBlock = document.createElement('div');
+            tenBlock.className = 'formula-ten-block';
+            tenBlock.textContent = '１０';
+            
+            const centerX = (selectedX + cherryX) / 2;
+            const centerY = (selectedY + cherryY) / 2;
+            tenBlock.style.left = centerX + 'px';
+            tenBlock.style.top = centerY + 'px';
+            
+            // 式セクションに追加
+            formulaSection.appendChild(tenCircle);
+            formulaSection.appendChild(tenBlock);
+            
+            // アニメーション開始
+            setTimeout(() => {
+                tenCircle.style.opacity = '1';
+                const currentTransform = tenCircle.style.transform;
+                tenCircle.style.transform = currentTransform + ' scale(1.1)';
+                setTimeout(() => {
+                    tenCircle.style.transform = currentTransform + ' scale(1)';
+                }, 250);
+            }, 10);
+            
+            tenCircleShown = true;
+        }
+
+        function hideTenAnimation() {
+            const tenCircles = document.querySelectorAll('.ten-circle');
+            const tenBlocks = document.querySelectorAll('.formula-ten-block');
+            
+            tenCircles.forEach(circle => circle.remove());
+            tenBlocks.forEach(block => block.remove());
+            
+            tenCircleShown = false;
+        }
+
+        // さくらんぼ方式のアニメーション表示
+        function showCherryAnimation() {
+            updateCherryDisplay(stepValues.split1, stepValues.split2, stepValues.otherNum);
+            
+            // 分解される数の項を強調表示し、適切なさくらんぼを表示
+            if (stepValues.selectedFirst) {
+                // 前項が選択された場合、後項（otherNum）を分解
+                highlightFormulaNumber('formula-second-container');
+                document.getElementById('cherry-display-second').classList.add('show');
+            } else {
+                // 後項が選択された場合、前項（otherNum）を分解
+                highlightFormulaNumber('formula-first-container');
+                document.getElementById('cherry-display-first').classList.add('show');
+            }
+            
+            cherryDisplayShown = true;
+        }
+
+        function hideCherryDisplay() {
+            document.getElementById('cherry-display-first').classList.remove('show');
+            document.getElementById('cherry-display-second').classList.remove('show');
+            cherryDisplayShown = false;
+        }
+
+        // 問題を生成する関数
+        function generateProblem() {
+            hideMessage();
+            hideCherryDisplay();
+            hideTenAnimation();
+            
+            let a, b, sum;
+            
+            // 1-9 + 1-9 = 11-20の範囲で生成
+            do {
+                a = Math.floor(Math.random() * 9) + 1; // 1-9
+                b = Math.floor(Math.random() * 9) + 1; // 1-9
+                sum = a + b;
+            } while (sum < 11 || sum > 20);
+
+            currentProblem = { a, b, sum };
+            currentStep = 0;
+            isProcessing = false;
+            cherryDisplayShown = false;
+            tenCircleShown = false;
+            
+            // どちらの項を使って10を作るかは後で決める
+            stepValues = {};
+            
+            document.getElementById('problem-text').innerHTML = `
+                Aさんは どんぐりを <strong>${a}</strong> こ ひろいました。<br>
+                Bさんは どんぐりを <strong>${b}</strong> こ ひろいました。<br>
+                あわせて なんこ でしょう？
+            `;
+
+            createAcorns('acorns-a', a);
+            createAcorns('acorns-b', b);
+            
+            resetSteps();
+            showStep(0);
+            
+            setTimeout(() => {
+                document.getElementById('formula-first').focus();
+            }, 100);
+        }
+
+        // ステップ表示を初期化
+        function resetSteps() {
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            document.getElementById('final-first').textContent = currentProblem.a;
+            document.getElementById('final-second').textContent = currentProblem.b;
+            
+            // 入力フィールドをクリア
+            const inputIds = [
+                'step1-input1', 'step1-input2',
+                'step2-input1', 'step2-input2',
+                'step3-input1', 'step3-input2',
+                'step4-input1', 'step4-input2',
+                'step5-input'
+            ];
+            
+            inputIds.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) input.value = '';
+            });
+        }
+
+        function showStep(stepNum) {
+            currentStep = stepNum;
+            if (stepNum === 0) {
+                document.querySelectorAll('.step').forEach(step => {
+                    step.classList.remove('active');
+                });
+            } else {
+                document.getElementById(`step${stepNum}`).classList.add('active');
+            }
+        }
+
+        function focusNextInput(delay = 300) {
+            setTimeout(() => {
+                let nextInput = null;
+                
+                if (currentStep === 1) {
+                    nextInput = document.getElementById('step1-input1');
+                } else if (currentStep === 2) {
+                    nextInput = document.getElementById('step2-input1');
+                } else if (currentStep === 3) {
+                    nextInput = document.getElementById('step3-input1');
+                } else if (currentStep === 4) {
+                    nextInput = document.getElementById('step4-input1');
+                } else if (currentStep === 5) {
+                    nextInput = document.getElementById('step5-input');
+                }
+                
+                if (nextInput) {
+                    nextInput.focus();
+                    nextInput.select();
+                }
+            }, delay);
+        }
+
+        function createAcorns(containerId, count) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            container.classList.remove('ten-frame');
+            
+            for (let i = 0; i < count; i++) {
+                const acorn = document.createElement('div');
+                acorn.className = 'acorn';
+                acorn.innerHTML = '🌰';
+                acorn.dataset.containerId = containerId;
+                acorn.dataset.index = i;
+                acorn.dataset.type = 'normal';
+                
+                container.appendChild(acorn);
+            }
+        }
+
+        function checkStep() {
+            if (isProcessing) return;
+
+            if (currentStep === 0) {
+                // 式のチェック
+                let formulaFirst = parseInt(document.getElementById('formula-first').value) || 0;
+                let formulaSecond = parseInt(document.getElementById('formula-second').value) || 0;
+                
+                if ((formulaFirst === currentProblem.a && formulaSecond === currentProblem.b) ||
+                    (formulaFirst === currentProblem.b && formulaSecond === currentProblem.a)) {
+                    hideMessage();
+                    showStep(1);
+                    focusNextInput(200);
+                } else {
+                    showMessage('もういちど、よくかんがえてみましょう', 'error');
+                    setTimeout(() => {
+                        document.getElementById('formula-first').focus();
+                    }, 100);
+                }
+                return;
+            }
+            
+            if (currentStep === 1) {
+                // ①のチェック - 選択した数字とその補数
+                let selectedNum = parseInt(document.getElementById('step1-input1').value) || 0;
+                let complement = parseInt(document.getElementById('step1-input2').value) || 0;
+                
+                // 選択した数字が式の項のどちらかであり、補数が正しいかチェック
+                if ((selectedNum === currentProblem.a || selectedNum === currentProblem.b) && 
+                    selectedNum + complement === 10 && complement > 0) {
+                    
+                    // stepValuesを設定
+                    stepValues.selectedNum = selectedNum;
+                    stepValues.complement = complement;
+                    stepValues.selectedFirst = (selectedNum === currentProblem.a);
+                    stepValues.otherNum = stepValues.selectedFirst ? currentProblem.b : currentProblem.a;
+                    
+                    // 分解で使う数を計算
+                    if (stepValues.otherNum >= complement) {
+                        stepValues.split1 = complement;
+                        stepValues.split2 = stepValues.otherNum - complement;
+                    } else {
+                        showMessage('この数のくみあわせではできません', 'error');
+                        return;
+                    }
+                    
+                    document.getElementById('other-num').textContent = stepValues.otherNum;
+                    
+                    hideMessage();
+                    isProcessing = true;
+                    animateStep1();
+                    setTimeout(() => {
+                        showStep(2);
+                        isProcessing = false;
+                        focusNextInput(300);
+                    }, 2000);
+                } else {
+                    showMessage('式の中の数字を選んで、１０になるように計算してください', 'error');
+                }
+                return;
+            }
+            
+            if (currentStep === 2) {
+                // ②のチェック - 数を分ける
+                let input1 = parseInt(document.getElementById('step2-input1').value) || 0;
+                let input2 = parseInt(document.getElementById('step2-input2').value) || 0;
+                
+                if ((input1 === stepValues.split1 && input2 === stepValues.split2) ||
+                    (input1 === stepValues.split2 && input2 === stepValues.split1)) {
+                    hideMessage();
+                    isProcessing = true;
+                    
+                    showCherryAnimation();
+                    animateStep2();
+                    
+                    setTimeout(() => {
+                        showStep(3);
+                        isProcessing = false;
+                        focusNextInput(300);
+                    }, 3000);
+                } else {
+                    showMessage('もういちど、よくかんがえてみましょう', 'error');
+                    setTimeout(() => {
+                        document.getElementById('step2-input1').focus();
+                    }, 100);
+                }
+                return;
+            }
+            
+            if (currentStep === 3) {
+                // ③のチェック - 10を作る
+                let input1 = parseInt(document.getElementById('step3-input1').value) || 0;
+                let input2 = parseInt(document.getElementById('step3-input2').value) || 0;
+                
+                if (input1 + input2 === 10) {
+                    // 入力された数がstepValuesの値と一致するかチェック
+                    let validCombination = false;
+                    if ((input1 === stepValues.selectedNum && input2 === stepValues.complement) ||
+                        (input1 === stepValues.complement && input2 === stepValues.selectedNum)) {
+                        stepValues.remaining = stepValues.split2;
+                        validCombination = true;
+                    }
+                    
+                    if (validCombination) {
+                        hideMessage();
+                        isProcessing = true;
+                        
+                        setTimeout(() => {
+                            showTenAnimation(input1, input2);
+                        }, 500);
+                        
+                        animateStep3();
+                        
+                        setTimeout(() => {
+                            showStep(4);
+                            isProcessing = false;
+                            focusNextInput(300);
+                        }, 2500);
+                    } else {
+                        showMessage('かんがえかた①で使った数を使ってください', 'error');
+                    }
+                } else {
+                    showMessage('２つの数をたして１０になるようにしてください', 'error');
+                }
+                return;
+            }
+            
+            if (currentStep === 4) {
+                // ④のチェック - 10と残りを合わせる
+                let input1 = parseInt(document.getElementById('step4-input1').value) || 0;
+                let input2 = parseInt(document.getElementById('step4-input2').value) || 0;
+                
+                if (input1 === stepValues.remaining && input2 === (10 + stepValues.remaining)) {
+                    hideMessage();
+                    setTimeout(() => {
+                        showStep(5);
+                        focusNextInput(300);
+                    }, 300);
+                } else {
+                    showMessage('もういちど、よくかんがえてみましょう', 'error');
+                    setTimeout(() => {
+                        document.getElementById('step4-input1').focus();
+                    }, 100);
+                }
+                return;
+            }
+            
+            if (currentStep === 5) {
+                // ⑤のチェック（最終答え）
+                let finalAnswer = parseInt(document.getElementById('step5-input').value) || 0;
+                
+                if (finalAnswer === currentProblem.sum) {
+                    showMessage('せいかいです。すごい！', 'success');
+                    correctCount++;
+                    document.getElementById('correct-count').textContent = correctCount;
+                    
+                    setTimeout(() => {
+                        if (correctCount >= totalProblems) {
+                            document.getElementById('problem-area').classList.add('hidden');
+                            document.getElementById('clear-area').classList.remove('hidden');
+                        } else {
+                            document.getElementById('next-btn').classList.remove('hidden');
+                            document.getElementById('next-btn').focus();
+                        }
+                    }, 2000);
+                } else {
+                    showMessage('もういちど、よくかんがえてみましょう', 'error');
+                    setTimeout(() => {
+                        document.getElementById('step5-input').focus();
+                    }, 100);
+                }
+                return;
+            }
+        }
+
+        // アニメーション関数群
+        function animateStep1() {
+            const targetContainer = stepValues.selectedFirst ? 'acorns-a' : 'acorns-b';
+            const container = document.getElementById(targetContainer);
+            const acorns = container.querySelectorAll('.acorn[data-type="normal"]');
+            
+            acorns.forEach((acorn, index) => {
+                setTimeout(() => {
+                    acorn.style.backgroundColor = '#ff7675';
+                    acorn.style.transform = 'scale(1.2)';
+                }, index * 100);
+            });
+            
+            setTimeout(() => {
+                // 補完する白いどんぐりを追加
+                for (let i = 0; i < stepValues.complement; i++) {
+                    const whiteAcorn = document.createElement('div');
+                    whiteAcorn.className = 'acorn white-acorn';
+                    whiteAcorn.innerHTML = '🌰';
+                    whiteAcorn.style.opacity = '0.7';
+                    whiteAcorn.dataset.type = 'white';
+                    container.appendChild(whiteAcorn);
+                }
+            }, 800);
+            
+            setTimeout(() => {
+                acorns.forEach(acorn => {
+                    acorn.style.backgroundColor = '';
+                    acorn.style.transform = '';
+                });
+            }, 2000);
+        }
+
+        function animateStep2() {
+            const otherContainer = stepValues.selectedFirst ? 'acorns-b' : 'acorns-a';
+            const container = document.getElementById(otherContainer);
+            const acorns = container.querySelectorAll('.acorn[data-type="normal"]');
+            
+            // 分解のアニメーション
+            for (let i = 0; i < stepValues.split1 && i < acorns.length; i++) {
+                setTimeout(() => {
+                    acorns[i].style.backgroundColor = '#ff7675';
+                    acorns[i].style.borderColor = '#d63031';
+                    acorns[i].dataset.group = 'red';
+                }, i * 100 + 1000);
+            }
+            
+            for (let i = stepValues.split1; i < acorns.length; i++) {
+                setTimeout(() => {
+                    acorns[i].style.backgroundColor = '#00b894';
+                    acorns[i].style.borderColor = '#00a085';
+                    acorns[i].dataset.group = 'green';
+                }, (i - stepValues.split1) * 100 + 1500);
+            }
+        }
+
+        function animateStep3() {
+            const selectedContainer = stepValues.selectedFirst ? 'acorns-a' : 'acorns-b';
+            const otherContainer = stepValues.selectedFirst ? 'acorns-b' : 'acorns-a';
+            
+            const selectedContainerElement = document.getElementById(selectedContainer);
+            const otherContainerElement = document.getElementById(otherContainer);
+            
+            // 白いどんぐりを削除
+            const whiteAcorns = selectedContainerElement.querySelectorAll('.white-acorn');
+            whiteAcorns.forEach(acorn => acorn.remove());
+            
+            // 赤いどんぐりを移動
+            const redAcorns = otherContainerElement.querySelectorAll('.acorn[data-group="red"]');
+            
+            Array.from(redAcorns).forEach((acorn, index) => {
+                setTimeout(() => {
+                    const newAcorn = document.createElement('div');
+                    newAcorn.className = 'acorn';
+                    newAcorn.innerHTML = '🌰';
+                    newAcorn.style.backgroundColor = '#ff7675';
+                    newAcorn.dataset.type = 'moved-red';
+                    selectedContainerElement.appendChild(newAcorn);
+                    
+                    acorn.remove();
+                }, index * 200 + 1000);
+            });
+            
+            setTimeout(() => {
+                selectedContainerElement.classList.add('ten-frame');
+            }, 1500);
+        }
+
+        function nextProblem() {
+            document.getElementById('formula-first').value = '';
+            document.getElementById('formula-second').value = '';
+            document.getElementById('next-btn').classList.add('hidden');
+            
+            generateProblem();
+        }
+
+        function restartGame() {
+            correctCount = 0;
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('problem-area').classList.remove('hidden');
+            document.getElementById('clear-area').classList.add('hidden');
+            nextProblem();
+        }
+
+        // イベントリスナー
+        document.addEventListener('keypress', function(e) {
+            if (e.target.tagName === 'INPUT') {
+                return;
+            }
+            
+            if (e.key === 'Enter') {
+                if (!document.getElementById('next-btn').classList.contains('hidden')) {
+                    nextProblem();
+                } else if (!isProcessing) {
+                    checkStep();
+                }
+            }
+        });
+
+        function addEnterKeyListeners() {
+            const inputFields = [
+                'formula-first', 'formula-second',
+                'step1-input1', 'step1-input2',
+                'step2-input1', 'step2-input2',
+                'step3-input1', 'step3-input2',
+                'step4-input1', 'step4-input2',
+                'step5-input'
+            ];
+            
+            inputFields.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (!isProcessing) {
+                                checkStep();
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // 初期化
+        generateProblem();
+        addEnterKeyListeners();
+    </script>
+</body>
+</html>
