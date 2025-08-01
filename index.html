@@ -266,11 +266,14 @@
 
         .cherry-line {
             width: 2px;
-            height: 40px;
+            height: 0;
             background: #2d3436;
             margin: 5px 0;
             position: relative;
-            animation: cherryLineGrow 1s ease-out 0.3s both;
+        }
+
+        .cherry-display.show .cherry-line {
+            animation: cherryLineGrow 0.6s ease-out 0.2s both;
         }
 
         .cherry-branches {
@@ -285,10 +288,13 @@
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 50px;
+            width: 0;
             height: 2px;
             background: #2d3436;
-            animation: cherryBranchGrow 0.8s ease-out 1s both;
+        }
+
+        .cherry-display.show .cherry-branches::before {
+            animation: cherryBranchGrow 0.6s ease-out 0.6s both;
         }
 
         .cherry-branch {
@@ -299,18 +305,21 @@
 
         .cherry-branch-line {
             width: 2px;
-            height: 25px;
+            height: 0;
             background: #2d3436;
             margin-bottom: 5px;
-            animation: cherryBranchLineGrow 0.6s ease-out both;
         }
 
-        .cherry-branch:nth-child(1) .cherry-branch-line {
-            animation-delay: 1.5s;
+        .cherry-display.show .cherry-branch-line {
+            animation: cherryBranchLineGrow 0.4s ease-out both;
         }
 
-        .cherry-branch:nth-child(2) .cherry-branch-line {
-            animation-delay: 1.7s;
+        .cherry-display.show .cherry-branch:nth-child(1) .cherry-branch-line {
+            animation-delay: 0.8s;
+        }
+
+        .cherry-display.show .cherry-branch:nth-child(2) .cherry-branch-line {
+            animation-delay: 1s;
         }
 
         .cherry-value {
@@ -322,21 +331,24 @@
             border: 2px solid #0984e3;
             min-width: 30px;
             text-align: center;
-            animation: cherryPop 0.8s ease forwards;
             opacity: 0;
             position: relative;
         }
 
-        .cherry-value.first {
-            background: #ff7675;
-            border-color: #d63031;
-            animation-delay: 2s;
+        .cherry-display.show .cherry-value {
+            animation: cherryPop 0.5s ease forwards;
         }
 
-        .cherry-value.second {
+        .cherry-display.show .cherry-value.first {
+            background: #ff7675;
+            border-color: #d63031;
+            animation-delay: 1.2s;
+        }
+
+        .cherry-display.show .cherry-value.second {
             background: #00b894;
             border-color: #00a085;
-            animation-delay: 2.2s;
+            animation-delay: 1.4s;
         }
 
         @keyframes cherryLineGrow {
@@ -796,8 +808,8 @@
         }
 
         // さくらんぼ方式の表示を更新
-        function updateCherryDisplay(split1, split2, targetNum) {
-            if (targetNum === currentProblem.a) {
+        function updateCherryDisplay(split1, split2, isFirstTerm) {
+            if (isFirstTerm) {
                 // 前項を分解する場合
                 document.getElementById('cherry-split1-first').textContent = split1;
                 document.getElementById('cherry-split2-first').textContent = split2;
@@ -866,9 +878,9 @@
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 const angle = Math.atan2(dy, dx) * (180 / Math.PI);
                 
-                // 楕円のサイズ（細長い楕円）
+                // 楕円のサイズ（より細長い楕円）
                 const width = distance + 60;
-                const height = 45;
+                const height = 35;
                 
                 // 中心位置（2点の中間点）
                 const centerX = (selectedX + cherryX) / 2;
@@ -879,7 +891,7 @@
                 tenCircle.style.width = width + 'px';
                 tenCircle.style.height = height + 'px';
                 tenCircle.style.transform = `rotate(${angle}deg)`;
-                tenCircle.style.borderRadius = '50% / 50%';
+                tenCircle.style.borderRadius = '50% / 40%';
             } else {
                 // 後項を分解した場合
                 // 2点間の距離と角度を計算
@@ -888,9 +900,9 @@
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 const angle = Math.atan2(dy, dx) * (180 / Math.PI);
                 
-                // 楕円のサイズ（細長い楕円）
+                // 楕円のサイズ（より細長い楕円）
                 const width = distance + 50;
-                const height = 45;
+                const height = 35;
                 
                 // 中心位置（2点の中間点）
                 const centerX = (selectedX + cherryX) / 2;
@@ -901,7 +913,7 @@
                 tenCircle.style.width = width + 'px';
                 tenCircle.style.height = height + 'px';
                 tenCircle.style.transform = `rotate(${angle}deg)`;
-                tenCircle.style.borderRadius = '50% / 50%';
+                tenCircle.style.borderRadius = '50% / 40%';
             }
             
             // アニメーション設定
@@ -947,15 +959,15 @@
 
         // さくらんぼ方式のアニメーション表示
         function showCherryAnimation() {
-            updateCherryDisplay(stepValues.split1, stepValues.split2, stepValues.otherNum);
-            
-            // 分解される数の項を強調表示し、適切なさくらんぼを表示
+            // 分解される数の項に応じて、適切なさくらんぼを更新
             if (stepValues.selectedFirst) {
                 // 前項が選択された場合、後項（otherNum）を分解
+                updateCherryDisplay(stepValues.split1, stepValues.split2, false);
                 highlightFormulaNumber('formula-second-container');
                 document.getElementById('cherry-display-second').classList.add('show');
             } else {
                 // 後項が選択された場合、前項（otherNum）を分解
+                updateCherryDisplay(stepValues.split1, stepValues.split2, true);
                 highlightFormulaNumber('formula-first-container');
                 document.getElementById('cherry-display-first').classList.add('show');
             }
